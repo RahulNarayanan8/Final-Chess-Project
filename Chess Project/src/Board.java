@@ -141,12 +141,16 @@ public class Board extends JFrame
 						if (piece_clicked != null) {
 						piece_type = getPieceTypeFromJLabel(piece_clicked);
 						piece_color = getPieceColorFromJLabel(piece_clicked);
-						piece_icon_str = getImageStringFromJLabel(piece_clicked);
-						piece_clicked_x = piece_clicked.getX();
-						piece_clicked_y = piece_clicked.getY();
-						int[] indices = MoveLegality.getIndicesFromCoords(piece_clicked_x,piece_clicked_y);
-						first_square = MoveLegality.getSquareFromIndices(indices[0], indices[1]);
-						board[indices[0]][indices[1]] = null;
+						if (!(piece_color.equals(turn)))
+							piece_clicked = null;
+						else{
+							piece_icon_str = getImageStringFromJLabel(piece_clicked);
+							piece_clicked_x = piece_clicked.getX();
+							piece_clicked_y = piece_clicked.getY();
+							int[] indices = MoveLegality.getIndicesFromCoords(piece_clicked_x,piece_clicked_y);
+							first_square = MoveLegality.getSquareFromIndices(indices[0], indices[1]);
+							board[indices[0]][indices[1]] = null;
+							}
 						}
 					}
 
@@ -173,6 +177,10 @@ public class Board extends JFrame
 							}
 							
 							piece_clicked.setLocation(correctCoords(piece_clicked.getX(),piece_clicked.getY())[0],correctCoords(piece_clicked.getX(),piece_clicked.getY())[1]);
+							if (turn.equals("white"))
+								turn = "black";
+							else
+								turn = "white";
 							int[] second_indices = MoveLegality.getIndicesFromCoords(piece_clicked.getX(),piece_clicked.getY());
 							second_square = MoveLegality.getSquareFromIndices(second_indices[0], second_indices[1]);
 							String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
