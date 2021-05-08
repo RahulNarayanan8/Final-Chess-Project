@@ -77,9 +77,8 @@ public class Board extends JFrame
 		
 		
 		int counter = 0;
-		int x,y;
-		x = 0;
-		y=0;
+		int x = 0;
+		int y=0;
 		boolean color = false;
 		Square[][] board_coordinates = new Square[8][8];
 		for (int file= 0;file<=7;file++)
