@@ -21,6 +21,8 @@ public class Board extends JFrame
 		setBounds(100,100,600,600);
 		setLayout(null);
 		
+		//Adding in all the pieces in their appropriate starting squares
+		
 		Piece[][] board = new Piece[8][8];
 		board[0][0] = new Piece("rook","black","/Users/rahulnarayanan/Desktop/Chess_Piece_images/black_rook(tOoQuOJl6n0).png");
 		board[0][1] = new Piece("knight","black","/Users/rahulnarayanan/Desktop/Chess_Piece_images/black_knight(wAao0gwitpC).png");
@@ -111,6 +113,8 @@ public class Board extends JFrame
 		
 		turn = "white";
 		
+		//Creating the move table where moves are recorded for the player to view
+		
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
@@ -126,6 +130,7 @@ public class Board extends JFrame
 					ArrayList<String> moves = new ArrayList<String>();
 					String first_square;
 					String second_square;
+					boolean piece_captured = false;
 
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -170,6 +175,7 @@ public class Board extends JFrame
 										{
 											piece_there.setVisible(false);
 											piece_there = null;
+											piece_captured = true;
 										}
 									}
 								}
@@ -185,18 +191,34 @@ public class Board extends JFrame
 							String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 							board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 							moves.add(combined);
-							if (moves.size()>8) {
-							if (moves.get(moves.size()-1).contains("white")&& moves.get(moves.size()-2).contains("white")) 
+							if (moves.size()>2) {
+							if (moves.get(moves.size()-1).contains("white")&& moves.get(moves.size()-1).contains("e1g1") && moves.get(moves.size()-1).contains("king")) 
 							{
-								moves.remove(moves.size()-1);
 								moves.remove(moves.size()-1);
 								moves.add("white O-O");
+								JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
+								white_castling_rook.setLocation(250, 350);
 							}
-							if (moves.get(moves.size()-1).contains("black")&& moves.get(moves.size()-2).contains("black")) 
+							if (moves.get(moves.size()-1).contains("black")&& moves.get(moves.size()-1).contains("e8g8") && moves.get(moves.size()-1).contains("king")) 
 							{
 								moves.remove(moves.size()-1);
-								moves.remove(moves.size()-1);
 								moves.add("black O-O");
+								JLabel black_castling_rook = findPieceAtCoords(375,25,visual_board);
+								black_castling_rook.setLocation(250, 0);
+							}
+							if (moves.get(moves.size()-1).equals("white king e1c1"))
+							{
+								moves.remove(moves.size()-1);
+								moves.add("white 0-0-0");
+								JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
+								white_qs_castling_rook.setLocation(150,350);
+							}
+							if (moves.get(moves.size()-1).equals("black king e8c8"))
+							{
+								moves.remove(moves.size()-1);
+								moves.add("black 0-0-0");
+								JLabel white_qs_castling_rook = findPieceAtCoords(25,25,visual_board);
+								white_qs_castling_rook.setLocation(150,0);
 							}
 							}
 							if (first_square.equals(second_square))
@@ -293,7 +315,7 @@ public class Board extends JFrame
 	}
 	public String getPieceColorFromJLabel (JLabel piece)
 	{
-		return (piece.getIcon().toString().substring(49,54));
+		return (piece.getIcon().toString().substring(49,54).toLowerCase());
 	}
 	public String getPieceTypeFromJLabel(JLabel piece)
 	{
