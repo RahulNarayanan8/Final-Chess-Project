@@ -182,15 +182,100 @@ public class Board extends JFrame
 							}
 							
 							piece_clicked.setLocation(correctCoords(piece_clicked.getX(),piece_clicked.getY())[0],correctCoords(piece_clicked.getX(),piece_clicked.getY())[1]);
+							int[] second_indices = MoveLegality.getIndicesFromCoords(piece_clicked.getX(),piece_clicked.getY());
+							second_square = MoveLegality.getSquareFromIndices(second_indices[0], second_indices[1]);
+							
+							if (piece_type.equals("pawn"))
+							{
+								if (!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))
+								{
+									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+								}
+								else
+								{
+									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+									moves.add(combined);
+									if (turn.equals("white"))
+										turn = "black";
+									else
+										turn = "white";
+									try
+									{
+									if (moves.get(moves.size()-1).charAt(0) == 'w')
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+									else
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+									}
+										
+									catch(Exception excep) {
+									}
+								}
+							}
+							else if (piece_type.equals("knight"))
+							{
+								if (!(MoveLegality.knightLegalBehavior(first_square, second_square)))
+								{
+									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+								}
+								else
+								{
+									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+									moves.add(combined);
+									if (turn.equals("white"))
+										turn = "black";
+									else
+										turn = "white";
+									try
+									{
+									if (moves.get(moves.size()-1).charAt(0) == 'w')
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+									else
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+									}
+										
+									catch(Exception excep) {
+									}
+								}
+							}
+							
+							else if (piece_type.equals("bishop"))
+							{
+								if (!(MoveLegality.bishopLegalBehavior(first_square, second_square)))
+								{
+									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+								}
+								else
+								{
+									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+									moves.add(combined);
+									if (turn.equals("white"))
+										turn = "black";
+									else
+										turn = "white";
+									try
+									{
+									if (moves.get(moves.size()-1).charAt(0) == 'w')
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+									else
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+									}
+										
+									catch(Exception excep) {
+									}
+								}
+							}
+							
+							else {
+							String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+							board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+							moves.add(combined);
 							if (turn.equals("white"))
 								turn = "black";
 							else
 								turn = "white";
-							int[] second_indices = MoveLegality.getIndicesFromCoords(piece_clicked.getX(),piece_clicked.getY());
-							second_square = MoveLegality.getSquareFromIndices(second_indices[0], second_indices[1]);
-							String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
-							board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
-							moves.add(combined);
 							if (moves.size()>2) {
 							if (moves.get(moves.size()-1).contains("white")&& moves.get(moves.size()-1).contains("e1g1") && moves.get(moves.size()-1).contains("king")) 
 							{
@@ -237,6 +322,7 @@ public class Board extends JFrame
 							}
 							
 						}
+					}
 					}
 
 					@Override
