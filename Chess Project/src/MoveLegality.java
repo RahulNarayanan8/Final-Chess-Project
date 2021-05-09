@@ -93,8 +93,69 @@ public class MoveLegality
 		}
 		return visual_arr;
 	}
-	
+	public static boolean pawnLegalBehavior(String startSquare, String endSquare, boolean capturing, String color)
+	{
+		if (color.equals("white")) {	
+			if (startSquare.charAt(0) == endSquare.charAt(0) && capturing ==false)
+			{
+				if (Character.getNumericValue(startSquare.charAt(1))+1 == Character.getNumericValue(endSquare.charAt(1)))
+				{
+					return true;
+				}
+			}
+			else if ((Math.abs(((int)startSquare.charAt(0))-(int)endSquare.charAt(0))==1) && capturing)
+			{
+				if (Character.getNumericValue(startSquare.charAt(1))+1 == Character.getNumericValue(endSquare.charAt(1)))
+				{
+					return true;
+				}
+			}
+		}
+		else
+			if (startSquare.charAt(0) == endSquare.charAt(0) && capturing ==false)
+			{
+				if (Character.getNumericValue(startSquare.charAt(1))-1 == Character.getNumericValue(endSquare.charAt(1)))
+				{
+					return true;
+				}
+			}
+			else if ((Math.abs(((int)startSquare.charAt(0))-(int)endSquare.charAt(0))==1) && capturing)
+			{
+				if (Character.getNumericValue(startSquare.charAt(1))-1 == Character.getNumericValue(endSquare.charAt(1)))
+				{
+					return true;
+				}
+			}
+		if (startSquare.charAt(1) == '2' && endSquare.charAt(1) == '4' && startSquare.charAt(0) == endSquare.charAt(0) && !capturing)
+			return true;
+		if (startSquare.charAt(1) == '7' && endSquare.charAt(1) == '5' && startSquare.charAt(0) == endSquare.charAt(0) && !capturing)
+			return true;
+		return false;
+	}
+	public static boolean knightLegalBehavior(String startSquare, String endSquare)
+	{
+		char startFile =startSquare.charAt(0);
+		char endFile =endSquare.charAt(0);
+		int startRank= Character.getNumericValue(startSquare.charAt(1));
+		int endRank = Character.getNumericValue(endSquare.charAt(1));
+		if (Math.abs(startFile-endFile) == 2 && Math.abs(startRank-endRank) == 1)
+			return true;
+		if (Math.abs(startFile-endFile) == 1 && Math.abs(startRank-endRank) == 2)
+			return true;
+		return false;
+	}
+	public static boolean bishopLegalBehavior(String startSquare, String endSquare)
+	{
+		char startFile =startSquare.charAt(0);
+		char endFile =endSquare.charAt(0);
+		int startRank= Character.getNumericValue(startSquare.charAt(1));
+		int endRank = Character.getNumericValue(endSquare.charAt(1));
+		if (Math.abs(startFile-endFile) == Math.abs(startRank-endRank))
+			return true;
+		return false;
+	}
 	public static void main(String []args)
 	{
+		System.out.println(MoveLegality.bishopLegalBehavior("f1", "b5"));
 	}
 }
