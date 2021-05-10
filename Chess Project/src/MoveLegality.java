@@ -1,4 +1,4 @@
-
+//helper methods for the board class
 import javax.swing.ImageIcon;
 
 import javax.swing.JLabel;
@@ -111,7 +111,7 @@ public class MoveLegality
 				}
 			}
 		}
-		else
+		else {
 			if (startSquare.charAt(0) == endSquare.charAt(0) && capturing ==false)
 			{
 				if (Character.getNumericValue(startSquare.charAt(1))-1 == Character.getNumericValue(endSquare.charAt(1)))
@@ -126,9 +126,10 @@ public class MoveLegality
 					return true;
 				}
 			}
-		if (startSquare.charAt(1) == '2' && endSquare.charAt(1) == '4' && startSquare.charAt(0) == endSquare.charAt(0) && !capturing)
+		}
+		if (startSquare.charAt(1) == '2' && endSquare.charAt(1) == '4' && startSquare.charAt(0) == endSquare.charAt(0) && !capturing && color.equals("white"))
 			return true;
-		if (startSquare.charAt(1) == '7' && endSquare.charAt(1) == '5' && startSquare.charAt(0) == endSquare.charAt(0) && !capturing)
+		if (startSquare.charAt(1) == '7' && endSquare.charAt(1) == '5' && startSquare.charAt(0) == endSquare.charAt(0) && !capturing && color.equals("black"))
 			return true;
 		return false;
 	}
@@ -154,8 +155,20 @@ public class MoveLegality
 			return true;
 		return false;
 	}
+	public static boolean rookLegalBehavior(String startSquare, String endSquare)
+	{
+		return ((startSquare.charAt(0) == endSquare.charAt(0)) || (startSquare.charAt(1) == endSquare.charAt(1)));
+	}
+	public static boolean queenLegalBehavior(String startSquare, String endSquare)
+	{
+		if (rookLegalBehavior(startSquare, endSquare) || bishopLegalBehavior(startSquare,endSquare))
+			return true;
+		return false;
+	}
+	
 	public static void main(String []args)
 	{
-		System.out.println(MoveLegality.bishopLegalBehavior("f1", "b5"));
+		System.out.println(MoveLegality.pawnLegalBehavior("b7", "b6", false, "black"));
 	}
 }
+
