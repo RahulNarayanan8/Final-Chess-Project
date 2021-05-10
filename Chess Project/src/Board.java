@@ -131,6 +131,7 @@ public class Board extends JFrame
 					String first_square;
 					String second_square;
 					boolean piece_captured = false;
+					JLabel temp = null;
 
 					@Override
 					public void mouseClicked(MouseEvent e) {
@@ -173,6 +174,7 @@ public class Board extends JFrame
 									{
 										if (piece_there.getX() == correctCoords(e.getX(),e.getY())[0] && piece_there.getY() == correctCoords(e.getX(),e.getY())[1])
 										{
+											temp = piece_there;
 											piece_there.setVisible(false);
 											piece_there = null;
 											piece_captured = true;
@@ -183,13 +185,17 @@ public class Board extends JFrame
 							
 							piece_clicked.setLocation(correctCoords(piece_clicked.getX(),piece_clicked.getY())[0],correctCoords(piece_clicked.getX(),piece_clicked.getY())[1]);
 							int[] second_indices = MoveLegality.getIndicesFromCoords(piece_clicked.getX(),piece_clicked.getY());
-							second_square = MoveLegality.getSquareFromIndices(second_indices[0], second_indices[1]);
-							
+							second_square = MoveLegality.getSquareFromIndices(second_indices[0], second_indices[1]);							
 							if (piece_type.equals("pawn"))
 							{
 								if (!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+									if (temp!=null && piece_captured) {
+										temp.setVisible(true);
+										piece_captured= false;
+										temp = null;
+									}
 								}
 								else
 								{
@@ -217,6 +223,11 @@ public class Board extends JFrame
 								if (!(MoveLegality.knightLegalBehavior(first_square, second_square)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+									if (temp!=null && piece_captured) {
+										temp.setVisible(true);
+										piece_captured = false;
+										temp = null;
+									}
 								}
 								else
 								{
@@ -245,6 +256,11 @@ public class Board extends JFrame
 								if (!(MoveLegality.bishopLegalBehavior(first_square, second_square)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+									if (temp!=null && piece_captured) {
+										temp.setVisible(true);
+										piece_captured = false;
+										temp = null;
+									}
 								}
 								else
 								{
@@ -268,6 +284,71 @@ public class Board extends JFrame
 								}
 							}
 							
+							else if (piece_type.equals("rook"))
+							{
+								if (!(MoveLegality.rookLegalBehavior(first_square, second_square)))
+								{
+									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+									if (temp!=null && piece_captured) {
+										temp.setVisible(true);
+										piece_captured = false;
+										temp = null;
+									}
+								}
+								else
+								{
+									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+									moves.add(combined);
+									if (turn.equals("white"))
+										turn = "black";
+									else
+										turn = "white";
+									try
+									{
+									if (moves.get(moves.size()-1).charAt(0) == 'w')
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+									else
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+									}
+										
+									catch(Exception excep) {
+									}
+								}
+							}
+							
+							else if (piece_type.equals("queen"))
+							{
+								if (!(MoveLegality.queenLegalBehavior(first_square, second_square)))
+								{
+									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+									if (temp!=null && piece_captured) {
+										temp.setVisible(true);
+										piece_captured = false;
+										temp = null;
+									}
+								}
+								else
+								{
+									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+									moves.add(combined);
+									if (turn.equals("white"))
+										turn = "black";
+									else
+										turn = "white";
+									try
+									{
+									if (moves.get(moves.size()-1).charAt(0) == 'w')
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+									else
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+									}
+										
+									catch(Exception excep) {
+									}
+								}
+							}
 							else {
 							String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 							board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
