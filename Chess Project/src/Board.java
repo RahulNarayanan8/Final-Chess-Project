@@ -21,7 +21,7 @@ public class Board extends JFrame
 	{
 		setBounds(100,100,600,600);
 		setLayout(null);
-		
+				
 		//Adding in all the pieces in their appropriate starting squares
 		
 		Piece[][] board = new Piece[8][8];
@@ -193,7 +193,7 @@ public class Board extends JFrame
 							
 							if (piece_type.equals("pawn"))
 							{
-								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
+								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -259,7 +259,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("bishop"))
 							{
-								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
+								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -292,7 +292,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("rook"))
 							{
-								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square))))
+								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -325,7 +325,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("queen"))
 							{
-								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
+								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -357,7 +357,7 @@ public class Board extends JFrame
 							}
 							else 
 							{
-								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
+								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -422,6 +422,10 @@ public class Board extends JFrame
 								}
 						}
 					}
+						if(isnotPawnCheck("black",visual_board))
+							System.out.println("black is in check");
+						if(isnotPawnCheck("white",visual_board))
+							System.out.println("white is in check");
 					}
 
 					@Override
@@ -487,11 +491,11 @@ public class Board extends JFrame
 		int [] return_arr = new int[2];
 		for (int i=0;i<coordinates.length;i++)
 		{
-			if (x>coordinates[i])
+			if (x>=coordinates[i])
 			{
 				return_arr[0] = coordinates[i];
 			}
-			if (y>coordinates[i])
+			if (y>=coordinates[i])
 			{
 				return_arr[1] = coordinates[i];
 			}
@@ -511,6 +515,87 @@ public class Board extends JFrame
 	{
 		return piece.getIcon().toString();
 	}
+	
+	public boolean isAnythingObstructing(String startSquare,String endSquare,JLabel[][] visual_board)
+	{
+		ArrayList<String> squaresBetween = MoveLegality.squaresBetween(startSquare, endSquare);
+		if (squaresBetween == null || squaresBetween.size() == 0)
+			return false;
+		for (String s:squaresBetween) {
+			if (findPieceAtCoords(MoveLegality.getCoordsFromSquare(s)[0],MoveLegality.getCoordsFromSquare(s)[1], visual_board) !=null)
+				{
+					return true;
+				}
+		}
+		return false;
+			
+	}
+	public String findKing(String color, JLabel[][] visual_board)
+	{
+		for (JLabel[] arr:visual_board)
+		{
+			for (JLabel piece:arr)
+			{
+				if(piece!=null) {
+				if (getPieceTypeFromJLabel(piece).equals("king") && getPieceColorFromJLabel(piece).equals(color))
+				{
+					int king_x = piece.getX();
+					int king_y = piece.getY();
+					int[] king_indices = MoveLegality.getIndicesFromCoords(king_x,king_y);
+					return MoveLegality.getSquareFromIndices(king_indices[0], king_indices[1]);
+				}
+				}
+			}
+		}
+		
+		return null;
+	}
+	public boolean isnotPawnCheck(String color, JLabel[][] visual_board)
+	{
+		String king_square = findKing(color,visual_board);
+		for (JLabel[] arr:visual_board)
+		{
+			for (JLabel piece:arr)
+			{
+				if (piece!=null)
+				{
+					if (!(getPieceTypeFromJLabel(piece).equals("king")) && !getPieceColorFromJLabel(piece).equals(color))
+					{
+						int piece_x = piece.getX();
+						int piece_y = piece.getY();
+						int[] piece_indices = MoveLegality.getIndicesFromCoords(piece_x,piece_y);
+						String first = MoveLegality.getSquareFromIndices(piece_indices[0], piece_indices[1]);
+						if (getPieceTypeFromJLabel(piece).equals("bishop")) {
+							if(MoveLegality.bishopLegalBehavior(first, king_square) && !isAnythingObstructing(first, king_square,visual_board))
+							{
+								return true;
+							}
+						}
+						if (getPieceTypeFromJLabel(piece).equals("knight")) {
+							if(MoveLegality.knightLegalBehavior(first, king_square))
+							{
+								return true;
+							}
+						}
+						if (getPieceTypeFromJLabel(piece).equals("rook")) {
+							if(MoveLegality.rookLegalBehavior(first, king_square) && !isAnythingObstructing(first, king_square,visual_board))
+							{
+								return true;
+							}
+						}
+						if (getPieceTypeFromJLabel(piece).equals("queen")) {
+							if(MoveLegality.queenLegalBehavior(first, king_square) && !isAnythingObstructing(first, king_square,visual_board))
+							{
+								return true;
+							}
+						}
+					}
+				}
+			}
+		}
+		return false;
+	}
+	
 	public static void main(String[] args)
 	{
 		new Board();
