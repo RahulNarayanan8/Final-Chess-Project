@@ -15,6 +15,7 @@ public class Board extends JFrame
 	private JLabel piece_clicked = null;
 	private JLabel[][] visual_board = new JLabel[8][8];
 	private String turn = "";
+	private boolean game_over= false;
 
 	public Board()
 	{
@@ -178,6 +179,8 @@ public class Board extends JFrame
 											piece_there.setVisible(false);
 											piece_there = null;
 											piece_captured = true;
+											
+											
 										}
 									}
 								}
@@ -186,15 +189,18 @@ public class Board extends JFrame
 							piece_clicked.setLocation(correctCoords(piece_clicked.getX(),piece_clicked.getY())[0],correctCoords(piece_clicked.getX(),piece_clicked.getY())[1]);
 							int[] second_indices = MoveLegality.getIndicesFromCoords(piece_clicked.getX(),piece_clicked.getY());
 							second_square = MoveLegality.getSquareFromIndices(second_indices[0], second_indices[1]);							
+							
+							
 							if (piece_type.equals("pawn"))
 							{
-								if (!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))
+								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
 										temp.setVisible(true);
 										piece_captured= false;
 										temp = null;
+										
 									}
 								}
 								else
@@ -220,7 +226,7 @@ public class Board extends JFrame
 							}
 							else if (piece_type.equals("knight"))
 							{
-								if (!(MoveLegality.knightLegalBehavior(first_square, second_square)))
+								if ((!(MoveLegality.knightLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -253,7 +259,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("bishop"))
 							{
-								if (!(MoveLegality.bishopLegalBehavior(first_square, second_square)))
+								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -286,7 +292,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("rook"))
 							{
-								if (!(MoveLegality.rookLegalBehavior(first_square, second_square)))
+								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square))))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -319,7 +325,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("queen"))
 							{
-								if (!(MoveLegality.queenLegalBehavior(first_square, second_square)))
+								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -349,59 +355,71 @@ public class Board extends JFrame
 									}
 								}
 							}
-							else {
-							String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
-							board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
-							moves.add(combined);
-							if (turn.equals("white"))
-								turn = "black";
-							else
-								turn = "white";
-							if (moves.size()>2) {
-							if (moves.get(moves.size()-1).contains("white")&& moves.get(moves.size()-1).contains("e1g1") && moves.get(moves.size()-1).contains("king")) 
+							else 
 							{
-								moves.remove(moves.size()-1);
-								moves.add("white O-O");
-								JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
-								white_castling_rook.setLocation(250, 350);
-							}
-							if (moves.get(moves.size()-1).contains("black")&& moves.get(moves.size()-1).contains("e8g8") && moves.get(moves.size()-1).contains("king")) 
-							{
-								moves.remove(moves.size()-1);
-								moves.add("black O-O");
-								JLabel black_castling_rook = findPieceAtCoords(375,25,visual_board);
-								black_castling_rook.setLocation(250, 0);
-							}
-							if (moves.get(moves.size()-1).equals("white king e1c1"))
-							{
-								moves.remove(moves.size()-1);
-								moves.add("white 0-0-0");
-								JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
-								white_qs_castling_rook.setLocation(150,350);
-							}
-							if (moves.get(moves.size()-1).equals("black king e8c8"))
-							{
-								moves.remove(moves.size()-1);
-								moves.add("black 0-0-0");
-								JLabel white_qs_castling_rook = findPieceAtCoords(25,25,visual_board);
-								white_qs_castling_rook.setLocation(150,0);
-							}
-							}
-							if (first_square.equals(second_square))
-							{
-								moves.remove(moves.size()-1);
-							}
-							try
-							{
-							if (moves.get(moves.size()-1).charAt(0) == 'w')
-								moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
-							else
-								moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
-							}
-								
-							catch(Exception excep) {
-							}
-							
+								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
+								{
+									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+									if (temp!=null && piece_captured) {
+										temp.setVisible(true);
+										piece_captured = false;
+										temp = null;
+									}
+								}
+								else
+								{
+									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+									moves.add(combined);
+									if (turn.equals("white"))
+										turn = "black";
+									else
+										turn = "white";
+									if (moves.size()>2) {
+									if (moves.get(moves.size()-1).contains("white")&& moves.get(moves.size()-1).contains("e1g1") && moves.get(moves.size()-1).contains("king")) 
+									{
+										moves.remove(moves.size()-1);
+										moves.add("white O-O");
+										JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
+										white_castling_rook.setLocation(250, 350);
+									}
+									if (moves.get(moves.size()-1).contains("black")&& moves.get(moves.size()-1).contains("e8g8") && moves.get(moves.size()-1).contains("king")) 
+									{
+										moves.remove(moves.size()-1);
+										moves.add("black O-O");
+										JLabel black_castling_rook = findPieceAtCoords(375,25,visual_board);
+										black_castling_rook.setLocation(250, 0);
+									}
+									if (moves.get(moves.size()-1).equals("white king e1c1"))
+									{
+										moves.remove(moves.size()-1);
+										moves.add("white 0-0-0");
+										JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
+										white_qs_castling_rook.setLocation(150,350);
+									}
+									if (moves.get(moves.size()-1).equals("black king e8c8"))
+									{
+										moves.remove(moves.size()-1);
+										moves.add("black 0-0-0");
+										JLabel white_qs_castling_rook = findPieceAtCoords(25,25,visual_board);
+										white_qs_castling_rook.setLocation(150,0);
+									}
+									}
+									if (first_square.equals(second_square))
+									{
+										moves.remove(moves.size()-1);
+									}
+									try
+									{
+									if (moves.get(moves.size()-1).charAt(0) == 'w')
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+									else
+										moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+									}
+										
+									catch(Exception excep) {
+									}
+								}
 						}
 					}
 					}
