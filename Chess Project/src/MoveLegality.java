@@ -1,4 +1,6 @@
 //helper methods for the board class
+import java.util.ArrayList;
+
 import javax.swing.ImageIcon;
 
 import javax.swing.JLabel;
@@ -95,6 +97,8 @@ public class MoveLegality
 	}
 	public static boolean pawnLegalBehavior(String startSquare, String endSquare, boolean capturing, String color)
 	{
+		if (startSquare.equals(endSquare))
+			return false;
 		if (color.equals("white")) {	
 			if (startSquare.charAt(0) == endSquare.charAt(0) && capturing ==false)
 			{
@@ -135,6 +139,8 @@ public class MoveLegality
 	}
 	public static boolean knightLegalBehavior(String startSquare, String endSquare)
 	{
+		if (startSquare.equals(endSquare))
+			return false;
 		char startFile =startSquare.charAt(0);
 		char endFile =endSquare.charAt(0);
 		int startRank= Character.getNumericValue(startSquare.charAt(1));
@@ -147,6 +153,8 @@ public class MoveLegality
 	}
 	public static boolean bishopLegalBehavior(String startSquare, String endSquare)
 	{
+		if (startSquare.equals(endSquare))
+			return false;
 		char startFile =startSquare.charAt(0);
 		char endFile =endSquare.charAt(0);
 		int startRank= Character.getNumericValue(startSquare.charAt(1));
@@ -157,6 +165,8 @@ public class MoveLegality
 	}
 	public static boolean rookLegalBehavior(String startSquare, String endSquare)
 	{
+		if (startSquare.equals(endSquare))
+			return false;
 		return ((startSquare.charAt(0) == endSquare.charAt(0)) || (startSquare.charAt(1) == endSquare.charAt(1)));
 	}
 	public static boolean queenLegalBehavior(String startSquare, String endSquare)
@@ -165,10 +175,108 @@ public class MoveLegality
 			return true;
 		return false;
 	}
-	
+	public static boolean kingLegalBehavior(String startSquare, String endSquare)
+	{
+		if (startSquare.equals(endSquare))
+			return false;
+		if (startSquare.equals("e1"))
+		{
+			if (endSquare.equals("c1") || endSquare.equals("g1"))
+				return true;
+		}
+		if (startSquare.equals("e8"))
+		{
+			if (endSquare.equals("c8") || endSquare.equals("g8"))
+				return true;
+		}
+		char startFile =startSquare.charAt(0);
+		char endFile =endSquare.charAt(0);
+		int startRank= Character.getNumericValue(startSquare.charAt(1));
+		int endRank = Character.getNumericValue(endSquare.charAt(1));
+		if (Math.abs(startRank-endRank) == 1 || Math.abs((int)(startFile)-(int)(endFile)) == 1)
+			return true;
+		return false;
+	}
+	public static ArrayList<String> squaresBetween(String startSquare, String endSquare)
+	{
+		if (startSquare.equals(endSquare))
+			return null;
+		if (!queenLegalBehavior(startSquare,endSquare))
+			return null;
+		String[][] board = {{"a8","b8","c8","d8","e8","f8","g8","h8"},{"a7","b7","c7","d7","e7","f7","g7","h7"},{"a6","b6","c6","d6","e6","f6","g6","h6"},{"a5","b5","c5","d5","e5","f5","g5","h5"},{"a4","b4","c4","d4","e4","f4","g4","h4"},{"a3","b3","c3","d3","e3","f3","g3","h3"},{"a2","b2","c2","d2","e2","f2","g2","h2"},{"a1","b1","c1","d1","e1","f1","g1","h1"}};
+		int srow =0,scolumn =0,erow =0,ecolumn =0;
+		ArrayList<String> return_arr = new ArrayList<String>();
+		for (int i=0;i<board.length;i++)
+		{
+			for (int j=0;j<board[0].length;j++)
+			{
+				if (board[i][j].equals(startSquare))
+				{
+					srow =i;
+					scolumn = j;
+				}
+				else if (board[i][j].equals(endSquare))
+				{
+					erow = i;
+					ecolumn = j;
+				}
+			}
+		}
+		if (srow == erow)	
+		{
+			if (scolumn<ecolumn)
+			{
+				for (int i=scolumn;i<ecolumn;i++)
+				{
+					return_arr.add(board[srow][i]);
+				}
+			}
+			else
+			{
+				for (int i=ecolumn;i<scolumn;i++)
+				{
+					return_arr.add(board[srow][i]);
+				}
+			}
+		}
+		else if (scolumn == ecolumn)
+		{
+			if (srow<erow)
+			{
+				for (int i=srow;i<erow;i++)
+				{
+					return_arr.add(board[i][scolumn]);
+				}
+			}
+			else
+			{
+				for (int i=erow;i<srow;i++)
+				{
+					return_arr.add(board[i][scolumn]);
+				}
+			}
+		}
+		else {
+			int rowDiff = (erow-srow)/(Math.abs(erow-srow));
+			int colDiff = (ecolumn-scolumn)/(Math.abs(ecolumn-scolumn));
+			int val = Math.abs(erow-srow);
+			for (int i=0;i<val;i++)
+			{
+				return_arr.add(board[srow][scolumn]);
+				srow+=rowDiff;
+				scolumn+=colDiff;
+			}
+		}
+		
+		return_arr.remove(startSquare);
+		return_arr.remove(endSquare);
+		return return_arr;
+				
+	}
 	public static void main(String []args)
 	{
-		System.out.println(MoveLegality.pawnLegalBehavior("b7", "b6", false, "black"));
+		ArrayList<String> return_arr = squaresBetween("f4","c1");
+		for (String s:return_arr)
+			System.out.println(s);
 	}
 }
-
