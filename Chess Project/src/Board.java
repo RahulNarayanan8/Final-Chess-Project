@@ -119,7 +119,7 @@ public class Board extends JFrame
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
-		
+						
 		this.addMouseListener(new MouseListener()
 				{
 			
@@ -159,6 +159,7 @@ public class Board extends JFrame
 							}
 						}
 					}
+					
 
 					@Override
 					public void mouseReleased(MouseEvent e) 
@@ -167,17 +168,18 @@ public class Board extends JFrame
 						{
 							piece_clicked.setLocation(e.getX(),e.getY());
 							
-							for (JLabel[] arr:visual_board)
+							for (int i=0;i<visual_board.length;i++)
 							{
-								for (JLabel piece_there:arr)
+								for (int j=0;j<visual_board[0].length;j++)
 								{
-									if (piece_there != null)
+									if (visual_board[i][j] != null)
 									{
-										if (piece_there.getX() == correctCoords(e.getX(),e.getY())[0] && piece_there.getY() == correctCoords(e.getX(),e.getY())[1])
+										if (visual_board[i][j].getX() == correctCoords(e.getX(),e.getY())[0] && visual_board[i][j].getY() == correctCoords(e.getX(),e.getY())[1])
 										{
-											temp = piece_there;
-											piece_there.setVisible(false);
-											piece_there = null;
+											temp = visual_board[i][j];
+											temp.setVisible(false);
+											visual_board[i][j].setVisible(false);
+											visual_board[i][j] = null;
 											piece_captured = true;
 											
 											
@@ -193,7 +195,7 @@ public class Board extends JFrame
 							
 							if (piece_type.equals("pawn"))
 							{
-								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
+								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -208,6 +210,8 @@ public class Board extends JFrame
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
+									temp = null;
+									piece_captured = false;
 									if (turn.equals("white"))
 										turn = "black";
 									else
@@ -226,7 +230,7 @@ public class Board extends JFrame
 							}
 							else if (piece_type.equals("knight"))
 							{
-								if ((!(MoveLegality.knightLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn)))
+								if ((!(MoveLegality.knightLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isnotPawnCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -240,6 +244,8 @@ public class Board extends JFrame
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
+									temp = null;
+									piece_captured = false;
 									if (turn.equals("white"))
 										turn = "black";
 									else
@@ -259,7 +265,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("bishop"))
 							{
-								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
+								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board) || isnotPawnCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -273,6 +279,8 @@ public class Board extends JFrame
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
+									temp = null;
+									piece_captured = false;
 									if (turn.equals("white"))
 										turn = "black";
 									else
@@ -292,7 +300,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("rook"))
 							{
-								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
+								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -306,6 +314,8 @@ public class Board extends JFrame
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
+									temp = null;
+									piece_captured = false;
 									if (turn.equals("white"))
 										turn = "black";
 									else
@@ -325,7 +335,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("queen"))
 							{
-								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
+								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -339,6 +349,8 @@ public class Board extends JFrame
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
+									temp = null;
+									piece_captured = false;
 									if (turn.equals("white"))
 										turn = "black";
 									else
@@ -357,7 +369,7 @@ public class Board extends JFrame
 							}
 							else 
 							{
-								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board))
+								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -371,6 +383,8 @@ public class Board extends JFrame
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
+									temp = null;
+									piece_captured = false;
 									if (turn.equals("white"))
 										turn = "black";
 									else
@@ -422,10 +436,8 @@ public class Board extends JFrame
 								}
 						}
 					}
-						if(isnotPawnCheck("black",visual_board))
-							System.out.println("black is in check");
-						if(isnotPawnCheck("white",visual_board))
-							System.out.println("white is in check");
+						
+					
 					}
 
 					@Override
@@ -448,7 +460,7 @@ public class Board extends JFrame
 					public void mouseDragged(MouseEvent e) 
 					{
 						if (piece_clicked!= null)
-							piece_clicked.setLocation(e.getX(),e.getY());
+							piece_clicked.setLocation(e.getX()-25,e.getY()-45);
 						
 					}
 
@@ -565,6 +577,12 @@ public class Board extends JFrame
 						int piece_y = piece.getY();
 						int[] piece_indices = MoveLegality.getIndicesFromCoords(piece_x,piece_y);
 						String first = MoveLegality.getSquareFromIndices(piece_indices[0], piece_indices[1]);
+						
+						if (getPieceTypeFromJLabel(piece).equals("pawn"))
+						{
+							if (MoveLegality.pawnLegalBehavior(first, king_square, true, getPieceColorFromJLabel(piece)))
+								return true;
+						}
 						if (getPieceTypeFromJLabel(piece).equals("bishop")) {
 							if(MoveLegality.bishopLegalBehavior(first, king_square) && !isAnythingObstructing(first, king_square,visual_board))
 							{
@@ -595,6 +613,13 @@ public class Board extends JFrame
 		}
 		return false;
 	}
+	public void makeMove(String start, String stop, JLabel[][] visual_board)
+	{
+		JLabel piece_moved = findPieceAtCoords(MoveLegality.getCoordsFromSquare(start)[0],MoveLegality.getCoordsFromSquare(start)[1], visual_board);
+		if (piece_moved!=null)
+			piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
+	}
+	
 	
 	public static void main(String[] args)
 	{
