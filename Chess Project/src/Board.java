@@ -10,6 +10,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 
 
@@ -122,7 +123,6 @@ public class Board extends JFrame
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
-		
 		
 		
 		
@@ -461,11 +461,13 @@ public class Board extends JFrame
 					}
 						if(isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
 						{
+							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      White Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 							System.exit(0);
 						}
 						if(isnotPawnCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
 						{
+							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      Black Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 							System.exit(0);
 
@@ -523,6 +525,29 @@ public class Board extends JFrame
 					if (piece.getX() == x_coord && piece.getY() == y_coord)
 					{	
 						returned_piece = piece;
+					}
+				}
+			}
+		}
+		return returned_piece;
+	}
+	public JLabel findSpecificPieceAtCoords(int x_value, int y_value, JLabel[][] visual_board, String piece_color)
+	{
+		int[] corrected_coords = correctCoords(x_value,y_value);
+		int x_coord = corrected_coords[0];
+		int y_coord = corrected_coords[1];
+		JLabel returned_piece = null;
+		for (JLabel[] arr: visual_board)
+		{
+			for (JLabel piece: arr)
+			{
+				if (piece!= null)
+				{
+					if (getPieceColorFromJLabel(piece).equals(piece_color)) {
+						if (piece.getX() == x_coord && piece.getY() == y_coord)
+						{	
+							returned_piece = piece;
+						}
 					}
 				}
 			}
@@ -645,11 +670,14 @@ public class Board extends JFrame
 		}
 		return false;
 	}
-	public void makeMove(String start, String stop, JLabel[][] visual_board)
+	public void makeMove(String start, String stop, JLabel[][] visual_board, String color)
 	{
-		JLabel piece_moved = findPieceAtCoords(MoveLegality.getCoordsFromSquare(start)[0],MoveLegality.getCoordsFromSquare(start)[1], visual_board);
+		JLabel piece_moved = findSpecificPieceAtCoords(MoveLegality.getCoordsFromSquare(start)[0],MoveLegality.getCoordsFromSquare(start)[1], visual_board, color);
 		if (piece_moved!=null)
-			piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
+			{
+				piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
+			}
+			
 	}
 	public ArrayList<String> generateMoves(String color, JLabel[][] visual_board)
 	{
@@ -677,31 +705,29 @@ public class Board extends JFrame
 									{
 										if (!isSquareOccupied(s,visual_board))
 										{
-											makeMove(piece_square,s,visual_board);
+											makeMove(piece_square,s,visual_board, color);
 											if (!isnotPawnCheck(color,visual_board))
 											{
-												makeMove(s,piece_square,visual_board);
+												makeMove(s,piece_square,visual_board, color);
 												moveList.add(piece_square+s);
 											}
-											makeMove(s,piece_square,visual_board);
+											makeMove(s,piece_square,visual_board, color);
 											
 										}
 									}
 								}
-								if(MoveLegality.pawnLegalBehavior(piece_square, s, true, color))
-								{
-									if (!isAnythingObstructing(piece_square,s,visual_board))
+								if (isSquareOccupied(s,visual_board)&& !isOwnPiece(color,s,visual_board)) {
+									if(MoveLegality.pawnLegalBehavior(piece_square, s, true, color))
 									{
-										if ((isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
+										if (!isAnythingObstructing(piece_square,s,visual_board))
 										{
-											makeMove(piece_square,s,visual_board);
+											makeMove(piece_square,s,visual_board, color);
 											if (!isnotPawnCheck(color,visual_board))
 											{
-												makeMove(s,piece_square,visual_board);
+												makeMove(s,piece_square,visual_board, color);
 												moveList.add(piece_square+s);
 											}
-											makeMove(s,piece_square,visual_board);
-											
+											makeMove(s,piece_square,visual_board, color);
 										}
 									}
 								}
@@ -713,13 +739,13 @@ public class Board extends JFrame
 									
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
-											makeMove(piece_square,s,visual_board);
+											makeMove(piece_square,s,visual_board, color);
 											if (!isnotPawnCheck(color,visual_board))
 											{
-												makeMove(s,piece_square,visual_board);
+												makeMove(s,piece_square,visual_board, color);
 												moveList.add(piece_square+s);
 											}
-											makeMove(s,piece_square,visual_board);
+											makeMove(s,piece_square,visual_board, color);
 											
 										}
 									
@@ -734,13 +760,13 @@ public class Board extends JFrame
 									{
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
-											makeMove(piece_square,s,visual_board);
+											makeMove(piece_square,s,visual_board, color);
 											if (!isnotPawnCheck(color,visual_board))
 											{
-												makeMove(s,piece_square,visual_board);
+												makeMove(s,piece_square,visual_board, color);
 												moveList.add(piece_square+s);
 											}
-											makeMove(s,piece_square,visual_board);
+											makeMove(s,piece_square,visual_board, color);
 											
 										}
 									}
@@ -755,13 +781,13 @@ public class Board extends JFrame
 									{
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
-											makeMove(piece_square,s,visual_board);
+											makeMove(piece_square,s,visual_board, color);
 											if (!isnotPawnCheck(color,visual_board))
 											{
-												makeMove(s,piece_square,visual_board);
+												makeMove(s,piece_square,visual_board, color);
 												moveList.add(piece_square+s);
 											}
-											makeMove(s,piece_square,visual_board);
+											makeMove(s,piece_square,visual_board, color);
 											
 										}
 									}
@@ -775,13 +801,13 @@ public class Board extends JFrame
 									{
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
-											makeMove(piece_square,s,visual_board);
+											makeMove(piece_square,s,visual_board, color);
 											if (!isnotPawnCheck(color,visual_board))
 											{
-												makeMove(s,piece_square,visual_board);
+												makeMove(s,piece_square,visual_board, color);
 												moveList.add(piece_square+s);
 											}
-											makeMove(s,piece_square,visual_board);
+											makeMove(s,piece_square,visual_board, color);
 											
 										}
 									}
