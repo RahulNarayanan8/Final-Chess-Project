@@ -3,6 +3,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.JOptionPane;
+
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -120,7 +122,10 @@ public class Board extends JFrame
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
-				
+		
+		
+		
+		
 		this.addMouseListener(new MouseListener()
 				{
 			
@@ -454,6 +459,17 @@ public class Board extends JFrame
 								}
 						}
 					}
+						if(isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
+						{
+							JOptionPane.showMessageDialog(null, "                                      White Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+							System.exit(0);
+						}
+						if(isnotPawnCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
+						{
+							JOptionPane.showMessageDialog(null, "                                      Black Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+							System.exit(0);
+
+						}
 					}
 
 					@Override
@@ -635,6 +651,170 @@ public class Board extends JFrame
 		if (piece_moved!=null)
 			piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
 	}
+	public ArrayList<String> generateMoves(String color, JLabel[][] visual_board)
+	{
+		ArrayList<String> moveList = new ArrayList<String>();
+		for (JLabel[] arr:visual_board)
+		{
+			for (JLabel piece: arr)
+			{
+				if (piece!=null)
+				{
+					if (getPieceColorFromJLabel(piece).equals(color))
+					{
+						int piece_x = piece.getX();
+						int piece_y = piece.getY();
+						int[] piece_indices = MoveLegality.getIndicesFromCoords(piece_x,piece_y);
+						String piece_square = MoveLegality.getSquareFromIndices(piece_indices[0], piece_indices[1]);
+						String[] squares = {"a8","b8","c8","d8","e8","f8","g8","h8","a7","b7","c7","d7","e7","f7","g7","h7","a6","b6","c6","d6","e6","f6","g6","h6","a5","b5","c5","d5","e5","f5","g5","h5","a4","b4","c4","d4","e4","f4","g4","h4","a3","b3","c3","d3","e3","f3","g3","h3","a2","b2","c2","d2","e2","f2","g2","h2","a1","b1","c1","d1","e1","f1","g1","h1"};
+						for (String s:squares)
+						{
+							if (getPieceTypeFromJLabel(piece).equals("pawn"))
+							{
+								if(MoveLegality.pawnLegalBehavior(piece_square, s, false, color))
+								{
+									if (!isAnythingObstructing(piece_square,s,visual_board))
+									{
+										if (!isSquareOccupied(s,visual_board))
+										{
+											makeMove(piece_square,s,visual_board);
+											if (!isnotPawnCheck(color,visual_board))
+											{
+												makeMove(s,piece_square,visual_board);
+												moveList.add(piece_square+s);
+											}
+											makeMove(s,piece_square,visual_board);
+											
+										}
+									}
+								}
+								if(MoveLegality.pawnLegalBehavior(piece_square, s, true, color))
+								{
+									if (!isAnythingObstructing(piece_square,s,visual_board))
+									{
+										if ((isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
+										{
+											makeMove(piece_square,s,visual_board);
+											if (!isnotPawnCheck(color,visual_board))
+											{
+												makeMove(s,piece_square,visual_board);
+												moveList.add(piece_square+s);
+											}
+											makeMove(s,piece_square,visual_board);
+											
+										}
+									}
+								}
+							}
+							if (getPieceTypeFromJLabel(piece).equals("knight"))
+							{
+								if(MoveLegality.knightLegalBehavior(piece_square, s))
+								{
+									
+										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
+										{
+											makeMove(piece_square,s,visual_board);
+											if (!isnotPawnCheck(color,visual_board))
+											{
+												makeMove(s,piece_square,visual_board);
+												moveList.add(piece_square+s);
+											}
+											makeMove(s,piece_square,visual_board);
+											
+										}
+									
+								}
+								
+							}
+							if (getPieceTypeFromJLabel(piece).equals("bishop"))
+							{
+								if(MoveLegality.bishopLegalBehavior(piece_square, s))
+								{
+									if (!isAnythingObstructing(piece_square,s,visual_board))
+									{
+										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
+										{
+											makeMove(piece_square,s,visual_board);
+											if (!isnotPawnCheck(color,visual_board))
+											{
+												makeMove(s,piece_square,visual_board);
+												moveList.add(piece_square+s);
+											}
+											makeMove(s,piece_square,visual_board);
+											
+										}
+									}
+								}
+								
+							}
+							if (getPieceTypeFromJLabel(piece).equals("rook"))
+							{
+								if(MoveLegality.rookLegalBehavior(piece_square, s))
+								{
+									if (!isAnythingObstructing(piece_square,s,visual_board))
+									{
+										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
+										{
+											makeMove(piece_square,s,visual_board);
+											if (!isnotPawnCheck(color,visual_board))
+											{
+												makeMove(s,piece_square,visual_board);
+												moveList.add(piece_square+s);
+											}
+											makeMove(s,piece_square,visual_board);
+											
+										}
+									}
+								}	
+							}
+							if (getPieceTypeFromJLabel(piece).equals("queen"))
+							{
+								if(MoveLegality.queenLegalBehavior(piece_square, s))
+								{
+									if (!isAnythingObstructing(piece_square,s,visual_board))
+									{
+										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
+										{
+											makeMove(piece_square,s,visual_board);
+											if (!isnotPawnCheck(color,visual_board))
+											{
+												makeMove(s,piece_square,visual_board);
+												moveList.add(piece_square+s);
+											}
+											makeMove(s,piece_square,visual_board);
+											
+										}
+									}
+								}
+								
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return moveList;
+	}
+	public boolean isSquareOccupied(String square, JLabel[][] visual_board)
+	{
+		int[] coords = MoveLegality.getCoordsFromSquare(square);
+		if (findPieceAtCoords(coords[0],coords[1],visual_board) == null)
+		{
+			return false;
+		}
+		return true;
+	}
+	public boolean isOwnPiece(String color, String square, JLabel[][] visual_board)
+	{
+		int[] coords = MoveLegality.getCoordsFromSquare(square);
+		if (getPieceColorFromJLabel(findPieceAtCoords(coords[0],coords[1],visual_board)).equals(color))
+		{
+			return true;
+		}
+		return false;
+	}
+	
 	public static void main(String[] args)
 	{
 		new Board();
