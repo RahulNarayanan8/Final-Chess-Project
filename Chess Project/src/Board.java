@@ -1,3 +1,4 @@
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTable;
@@ -119,7 +120,7 @@ public class Board extends JFrame
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
-						
+				
 		this.addMouseListener(new MouseListener()
 				{
 			
@@ -207,6 +208,23 @@ public class Board extends JFrame
 								}
 								else
 								{
+									if (second_square.charAt(1) == '8')
+									{
+										if (turn.equals("white")) {
+											piece_clicked.setIcon(new ImageIcon("/Users/rahulnarayanan/Desktop/Chess_Piece_images/White_queen(mm3Xl34BAaA).png"));
+											repaint();
+										}
+									}
+									if (second_square.charAt(1) == '1')
+									{
+										if (turn.equals("black")) {
+											piece_clicked.setIcon(new ImageIcon("/Users/rahulnarayanan/Desktop/Chess_Piece_images/black_queen(WJdlIxms2Ll).png"));
+											repaint();
+										}
+									}
+									
+									
+									
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
 									board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
 									moves.add(combined);
@@ -436,8 +454,6 @@ public class Board extends JFrame
 								}
 						}
 					}
-						
-					
 					}
 
 					@Override
@@ -619,8 +635,6 @@ public class Board extends JFrame
 		if (piece_moved!=null)
 			piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
 	}
-	
-	
 	public static void main(String[] args)
 	{
 		new Board();
