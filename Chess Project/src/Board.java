@@ -397,6 +397,135 @@ public class Board extends JFrame
 										temp = null;
 									}
 								}
+								else if ((first_square.equals("e1") && second_square.equals("g1")) || (first_square.equals("e1") && second_square.equals("c1")) || (first_square.equals("e8") && second_square.equals("g8")) || (first_square.equals("e8") && second_square.equals("g8")))
+								{
+									boolean illegal = false;
+									if (hasKingMoved(turn,moves)) {
+										piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+										illegal = true;
+									}
+									else
+									{
+										if ((first_square.equals("e1") && second_square.equals("g1"))) {
+											if (hasKingRookMoved("white",moves)) {
+												piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+											}
+										}
+										else if ((first_square.equals("e8") && second_square.equals("g8"))) {
+											if (hasKingRookMoved("black",moves)) {
+												piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+												illegal = true;
+											}
+										}
+										else if ((first_square.equals("e1") && second_square.equals("c1"))) {
+											if (hasQueenRookMoved("white",moves)) {
+												piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+											}
+										}
+										else if ((first_square.equals("e8") && second_square.equals("c8"))) {
+											if (hasQueenRookMoved("black",moves)) {
+												piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+											}
+										}
+										
+										
+										if (!illegal && turn.equals("white") && isSideAttackingSquare("e1","black",visual_board))
+										{
+											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+										}
+										if (!illegal && turn.equals("black") && isSideAttackingSquare("e8","white",visual_board))
+										{
+											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+										}
+										
+										if (!illegal)
+										{
+											if (first_square.equals("e1") && second_square.equals("g1"))
+											{
+												String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+												board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+												moves.add(combined);
+												temp = null;
+												piece_captured = false;
+												if (turn.equals("white"))
+													turn = "black";
+												else
+													turn = "white";
+												moves.remove(moves.size()-1);
+												moves.add("white O-O");
+												JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
+												white_castling_rook.setLocation(250, 350);
+											}
+											if (first_square.equals("e1") && second_square.equals("c1"))
+											{
+												String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+												board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+												moves.add(combined);
+												temp = null;
+												piece_captured = false;
+												if (turn.equals("white"))
+													turn = "black";
+												else
+													turn = "white";
+												moves.remove(moves.size()-1);
+												moves.add("white 0-0-0");
+												JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
+												white_qs_castling_rook.setLocation(150,350);
+											}
+											if (first_square.equals("e8") && second_square.equals("g8"))
+											{
+												String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+												board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+												moves.add(combined);
+												temp = null;
+												piece_captured = false;
+												if (turn.equals("white"))
+													turn = "black";
+												else
+													turn = "white";
+												moves.remove(moves.size()-1);
+												moves.add("black O-O");
+												JLabel black_castling_rook = findPieceAtCoords(375,25,visual_board);
+												black_castling_rook.setLocation(250, 0);
+											}
+											if (first_square.equals("e8") && second_square.equals("c8"))
+											{
+												String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
+												board[second_indices[0]][second_indices[1]] = new Piece(piece_type,piece_color,piece_icon_str);
+												moves.add(combined);
+												temp = null;
+												piece_captured = false;
+												if (turn.equals("white"))
+													turn = "black";
+												else
+													turn = "white";
+												moves.remove(moves.size()-1);
+												moves.add("black 0-0-0");
+												JLabel white_qs_castling_rook = findPieceAtCoords(25,25,visual_board);
+												white_qs_castling_rook.setLocation(150,0);
+											}
+											try
+											{
+											if (moves.get(moves.size()-1).charAt(0) == 'w')
+												moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+											else
+												moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+											}
+												
+											catch(Exception excep) {
+											}
+										}
+										
+									}
+								
+								
+								
+								}
 								else
 								{
 									String combined = piece_color+ " "+piece_type + " " + first_square+second_square;
@@ -408,40 +537,6 @@ public class Board extends JFrame
 										turn = "black";
 									else
 										turn = "white";
-									if (moves.size()>2) {
-									if (moves.get(moves.size()-1).contains("white")&& moves.get(moves.size()-1).contains("e1g1") && moves.get(moves.size()-1).contains("king")) 
-									{
-										moves.remove(moves.size()-1);
-										moves.add("white O-O");
-										JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
-										white_castling_rook.setLocation(250, 350);
-									}
-									if (moves.get(moves.size()-1).contains("black")&& moves.get(moves.size()-1).contains("e8g8") && moves.get(moves.size()-1).contains("king")) 
-									{
-										moves.remove(moves.size()-1);
-										moves.add("black O-O");
-										JLabel black_castling_rook = findPieceAtCoords(375,25,visual_board);
-										black_castling_rook.setLocation(250, 0);
-									}
-									if (moves.get(moves.size()-1).equals("white king e1c1"))
-									{
-										moves.remove(moves.size()-1);
-										moves.add("white 0-0-0");
-										JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
-										white_qs_castling_rook.setLocation(150,350);
-									}
-									if (moves.get(moves.size()-1).equals("black king e8c8"))
-									{
-										moves.remove(moves.size()-1);
-										moves.add("black 0-0-0");
-										JLabel white_qs_castling_rook = findPieceAtCoords(25,25,visual_board);
-										white_qs_castling_rook.setLocation(150,0);
-									}
-									}
-									if (first_square.equals(second_square))
-									{
-										moves.remove(moves.size()-1);
-									}
 									try
 									{
 									if (moves.get(moves.size()-1).charAt(0) == 'w')
@@ -454,7 +549,7 @@ public class Board extends JFrame
 									}
 								}
 						}
-					}
+					}	
 						
 						
 						if(isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
@@ -850,6 +945,14 @@ public class Board extends JFrame
 			}
 		}
 		
+		if (checkList!=null && checkList.size()>0)
+		{
+			moveList.remove("kinge1g1");
+			moveList.remove("kinge1c1");
+			moveList.remove("kinge8g8");
+			moveList.remove("kinge8c8");
+		}
+		
 		return moveList;
 	}
 	public boolean isSquareOccupied(String square, JLabel[][] visual_board)
@@ -1005,6 +1108,55 @@ public class Board extends JFrame
 			}
 		}
 		return checking_pieces;
+	}
+	public boolean hasKingMoved(String color, ArrayList<String> moves)
+	{
+		for (String s:moves)
+		{
+			if (s.contains(color) && s.contains("king"))
+				return true;
+		}
+		return false;
+	}
+	public boolean hasKingRookMoved(String color, ArrayList<String> moves)
+	{
+		if (color.equals("white"))
+		{
+			for (String s:moves)
+			{
+				if (s.contains("rook") && s.contains("h1"))
+					return true;
+			}
+		}
+		else
+		{
+			for (String s:moves)
+			{
+				if (s.contains("rook") && s.contains("h8"))
+					return true;
+			}
+		}
+		return false;
+	}
+	public boolean hasQueenRookMoved(String color, ArrayList<String> moves)
+	{
+		if (color.equals("white"))
+		{
+			for (String s:moves)
+			{
+				if (s.contains("rook") && s.contains("a1"))
+					return true;
+			}
+		}
+		else
+		{
+			for (String s:moves)
+			{
+				if (s.contains("rook") && s.contains("a8"))
+					return true;
+			}
+		}
+		return false;
 	}
 	public static void main(String[] args)
 	{
