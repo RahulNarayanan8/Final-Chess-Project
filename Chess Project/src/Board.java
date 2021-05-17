@@ -388,7 +388,7 @@ public class Board extends JFrame
 							}
 							else 
 							{
-								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
+								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board) || (first_square.equals("e1") && second_square.equals("e8") || (first_square.equals("e8") && second_square.equals("e1"))))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -438,6 +438,26 @@ public class Board extends JFrame
 											illegal = true;
 										}
 										if (!illegal && turn.equals("black") && isSideAttackingSquare("e8","white",visual_board))
+										{
+											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+										}
+										if (!illegal && (first_square.equals("e1") && second_square.equals("g1")) && isSideAttackingSquare("f1", "black",visual_board))
+										{
+											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+										}
+										if (!illegal && (first_square.equals("e8") && second_square.equals("g8")) && isSideAttackingSquare("f8", "white",visual_board))
+										{
+											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+										}
+										if (!illegal && (first_square.equals("e1") && second_square.equals("c1")) && isSideAttackingSquare("d1", "black",visual_board))
+										{
+											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
+											illegal = true;
+										}
+										if (!illegal && (first_square.equals("e8") && second_square.equals("c8")) && isSideAttackingSquare("d8", "white",visual_board))
 										{
 											piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 											illegal = true;
@@ -522,9 +542,6 @@ public class Board extends JFrame
 										}
 										
 									}
-								
-								
-								
 								}
 								else
 								{
@@ -563,7 +580,26 @@ public class Board extends JFrame
 							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      Black Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 							System.exit(0);
-						}	
+						}
+						if (isDrawByInsufficientMaterial(visual_board))
+						{
+							game_over = true;
+							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Insufficient Material                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+						}
+						if(!isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
+						{
+							game_over = true;
+							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Stalemate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+							System.exit(0);
+						}
+						if(!isnotPawnCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
+						{
+							game_over = true;
+							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Stalemate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+							System.exit(0);
+						}
+						
+							
 					}
 
 					@Override
@@ -1156,6 +1192,40 @@ public class Board extends JFrame
 					return true;
 			}
 		}
+		return false;
+	}
+	public ArrayList<String> getAllPiecesBySide(String color,JLabel[][] visual_board)
+	{
+		ArrayList<String> list_of_pieces = new ArrayList<String>();
+		for (JLabel[] arr:visual_board)
+		{
+			for (JLabel piece:arr)
+			{
+				if (piece!=null) {
+					if (getPieceColorFromJLabel(piece).equals(color))
+						list_of_pieces.add(getPieceTypeFromJLabel(piece));
+				}
+			}
+			
+		}
+		return list_of_pieces;
+	}
+	public boolean isDrawByInsufficientMaterial(JLabel[][] visual_board)
+	{
+		ArrayList<String> white_pieces = getAllPiecesBySide("white",visual_board);
+		ArrayList<String> black_pieces = getAllPiecesBySide("black",visual_board);
+		String pieces = "";
+		for (String s:white_pieces)
+			pieces+=s;
+		for(String s:black_pieces)
+			pieces+=s;
+		if (pieces.equals("kingking"))
+			return true;
+		if (pieces.equals("kingknightking")||pieces.equals("knightkingking")||pieces.equals("kingkingknight"))
+			return true;
+		if (pieces.equals("kingbishopking")||pieces.equals("bishopkingking")||pieces.equals("kingkingbishop"))
+			return true;
+		
 		return false;
 	}
 	public static void main(String[] args)
