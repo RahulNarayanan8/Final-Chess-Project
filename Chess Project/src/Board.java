@@ -701,12 +701,24 @@ public class Board extends JFrame
 	}
 	public String getPieceColorFromJLabel (JLabel piece)
 	{
-		return (piece.getIcon().toString().substring(49,54).toLowerCase());
+		if (piece.getIcon().toString().toLowerCase().contains("white"))
+			return "white";
+		return "black";
 	}
 	public String getPieceTypeFromJLabel(JLabel piece)
 	{
 		String icon_str = piece.getIcon().toString();
-		return icon_str.substring(55,icon_str.length()-17);
+		if (icon_str.contains("pawn"))
+			return "pawn";
+		else if (icon_str.contains("knight"))
+			return "knight";
+		else if(icon_str.contains("bishop"))
+			return "bishop";
+		else if (icon_str.contains("rook"))
+			return "rook";
+		else if(icon_str.contains("queen"))
+			return "queen";
+		return "king";
 	}
 	public String getImageStringFromJLabel(JLabel piece)
 	{
