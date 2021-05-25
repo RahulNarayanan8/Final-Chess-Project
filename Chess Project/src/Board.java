@@ -145,7 +145,7 @@ public class Board extends JFrame
 					@Override
 					public void mousePressed(MouseEvent e) 
 					{
-						piece_clicked = findPieceAtCoords(e.getX(), e.getY(), visual_board);
+						piece_clicked = findPieceAtCoords(e.getX(), e.getY()-22, visual_board); //22 is the top inset size
 						if (piece_clicked != null) {
 						piece_type = getPieceTypeFromJLabel(piece_clicked);
 						piece_color = getPieceColorFromJLabel(piece_clicked);
