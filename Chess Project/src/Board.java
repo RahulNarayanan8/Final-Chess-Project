@@ -1,15 +1,16 @@
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JOptionPane;
-
-
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 
 public class Board extends JFrame
@@ -25,7 +26,7 @@ public class Board extends JFrame
 		setLayout(null);
 				
 		//Adding in all the pieces in their appropriate starting squares
-		
+		//Use the appropriate file path given where you saved the Chess_Piece_images folder
 		Piece[][] board = new Piece[8][8];
 		board[0][0] = new Piece("rook","black","/Users/rahulnarayanan/Desktop/Chess_Piece_images/black_rook(tOoQuOJl6n0).png");
 		board[0][1] = new Piece("knight","black","/Users/rahulnarayanan/Desktop/Chess_Piece_images/black_knight(wAao0gwitpC).png");
@@ -63,7 +64,7 @@ public class Board extends JFrame
 		board[7][6] = new Piece("knight","white","/Users/rahulnarayanan/Desktop/Chess_Piece_images/white_knight(2r1HceSdkD0).png");
 		board[7][7] = new Piece("rook","white","/Users/rahulnarayanan/Desktop/Chess_Piece_images/white_rook(ttamcrm8fvD).png");
 		
-		
+		// Creates array of piece Jlabels and adds them to the frame
 		visual_board = MoveLegality.convertArraytoVisual(board);
 		
 		for (JLabel[] j: visual_board)
@@ -113,15 +114,44 @@ public class Board extends JFrame
 				this.add(s);
 			}
 		}
-		
+		// Creating the resign button
 		turn = "white";
+		JButton resign_button = new JButton();
+		resign_button.setIcon(new ImageIcon("/Users/rahulnarayanan/eclipse-workspace/Chess Project/Resign.png"));// change file path to what is appropriate for you
+		resign_button.setBounds(200,500,98,64);
+		resign_button.setVisible(true);
+		this.add(resign_button);
+		resign_button.addActionListener(new ActionListener()		
+		{
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				if (turn.equals("white"))
+				{
+					game_over = true;
+					JOptionPane.showMessageDialog(null, "                                      Black Wins By Resignation                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					System.exit(0);
+				}
+				if (turn.equals("black"))
+				{
+					game_over = true;
+					JOptionPane.showMessageDialog(null, "                                      White Wins By Resignation                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+					System.exit(0);
+				}
+			}
+			
+		});
 		
 		//Creating the move table where moves are recorded for the player to view
 		
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
-				
+		
+		JOptionPane.showMessageDialog(null, "Welcome to Chess!");
+		// The code below is the real heart of the chess program. This is the code that handles dragging and dropping.
+		//Additionally, if an illegal move is dragged and dropped, the mouseListener will reset the piece to its original square
 		this.addMouseListener(new MouseListener()
 				{
 			
