@@ -647,13 +647,36 @@ public class AIBoard extends JFrame
 						int index = (int) (Math.random()*black_moves.size());
 						String move = black_moves.get(index);
 						try {
+							int[] coords = MoveLegality.getCoordsFromSquare(move.substring(move.length()-2));
+							if (findPieceAtCoords(coords[0],coords[1],visual_board)!=null)
+							{
+								for (JLabel[] arr:visual_board)
+								{
+									for (JLabel piece:arr)
+									{
+										if (piece.getX() == coords[0] && piece.getY() == coords[1])
+											piece = null;
+											piece.setVisible(false);
+									}
+								}
+								
+							}
 							makeMove(move.substring(move.length()-4,move.length()-2),move.substring(move.length()-2), visual_board,"black");
+							
+							moves.add(move);
+							try
+							{
+								moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
+							}
+								
+							catch(Exception excep) {
+							}
 							turn = "white";
 						
 						}
 						catch(Exception exception)
 						{
-							System.out.println("you done goofed");
+							System.out.println("Problems arose");
 							System.exit(0);
 						}
 						}
@@ -879,7 +902,7 @@ public class AIBoard extends JFrame
 		JLabel piece_moved = findSpecificPieceAtCoords(MoveLegality.getCoordsFromSquare(start)[0],MoveLegality.getCoordsFromSquare(start)[1], visual_board, color);
 		if (piece_moved!=null)
 			{
-				piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
+			piece_moved.setLocation(MoveLegality.getCoordsFromSquare(stop)[0],MoveLegality.getCoordsFromSquare(stop)[1]);
 			}
 			
 	}
@@ -1313,8 +1336,53 @@ public class AIBoard extends JFrame
 		
 		return false;
 	}
+	public int evaluateMaterial(JLabel[][] visual_board)
+	{
+		int white_total = 0;
+		int black_total = 0;
+		for (JLabel[] arr:visual_board)
+		{
+			for (JLabel piece:arr)
+			{
+				if (piece!=null)
+				{
+					if (getPieceColorFromJLabel(piece).equals("white"))
+					{
+						if (getPieceTypeFromJLabel(piece).equals("pawn"))
+							white_total++;
+						if (getPieceTypeFromJLabel(piece).equals("knight"))
+							white_total+=3;
+						if (getPieceTypeFromJLabel(piece).equals("bishop"))
+							white_total+=3;
+						if (getPieceTypeFromJLabel(piece).equals("rook"))
+							white_total+=5;
+						if (getPieceTypeFromJLabel(piece).equals("queen"))
+							white_total+=9;
+					}
+					if (getPieceColorFromJLabel(piece).equals("black"))
+					{
+						if (getPieceTypeFromJLabel(piece).equals("pawn"))
+							black_total++;
+						if (getPieceTypeFromJLabel(piece).equals("knight"))
+							black_total+=3;
+						if (getPieceTypeFromJLabel(piece).equals("bishop"))
+							black_total+=3;
+						if (getPieceTypeFromJLabel(piece).equals("rook"))
+							black_total+=5;
+						if (getPieceTypeFromJLabel(piece).equals("queen"))
+							black_total+=9;
+					}
+				}
+			}
+		}
+		return white_total-black_total;
+	}
+	public String truncateMove(String move)
+	{
+		String[] parts = move.split(" ");
+		return parts[parts.length-1];
+	}
 	public static void main(String[] args)
 	{
 		new AIBoard();
 	}
-}
