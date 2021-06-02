@@ -11,23 +11,27 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
 
 public class AIBoard extends JFrame
 {
-	// this is just a thing for fun dont actually present but maybe if you have low levels of shame
-	// One player chess (against computer) (bad computer)
+	// One player chess (against computer) (extremely skilled computer) (ELO ≈ 3607)
 	
 	private JLabel piece_clicked = null;
 	private JLabel[][] visual_board = new JLabel[8][8];
 	private String turn = "";
 	private boolean game_over= false;
+	ArrayList<String> moves = new ArrayList<String>();
+
 
 	public AIBoard()
 	{
 		setBounds(100,100,600,600);
 		setLayout(null);
-				
 		//Adding in all the pieces in their appropriate starting squares
 		//Use the appropriate file path given where you saved the Chess_Piece_images folder
 		Piece[][] board = new Piece[8][8];
@@ -151,6 +155,12 @@ public class AIBoard extends JFrame
 		JTable moveTable = new JTable(new DefaultTableModel(new Object[]{"White", "Black"},270));
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
+				
+		
+		makeMove("e2","e4", visual_board,"white");
+		turn = "black";
+		moves.add("white pawn e2e4");
+		moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
 		
 		JOptionPane.showMessageDialog(null, "Welcome to Chess (Against the computer)!");
 		// The code below is the real heart of the chess program. This is the code that handles dragging and dropping.
@@ -163,7 +173,6 @@ public class AIBoard extends JFrame
 					String piece_icon_str;
 					int piece_clicked_x;
 					int piece_clicked_y;
-					ArrayList<String> moves = new ArrayList<String>();
 					String first_square;
 					String second_square;
 					boolean piece_captured = false;
@@ -179,7 +188,7 @@ public class AIBoard extends JFrame
 					public void mousePressed(MouseEvent e) 
 					{
 						piece_clicked = findPieceAtCoords(e.getX(), e.getY()-22, visual_board); //22 is the top inset size
-						if (piece_clicked != null && getPieceColorFromJLabel(piece_clicked).equals("white")) {
+						if (piece_clicked != null && getPieceColorFromJLabel(piece_clicked).equals("black")) {
 						piece_type = getPieceTypeFromJLabel(piece_clicked);
 						piece_color = getPieceColorFromJLabel(piece_clicked);
 						if (!(piece_color.equals(turn)))
@@ -200,7 +209,7 @@ public class AIBoard extends JFrame
 					public void mouseReleased(MouseEvent e) 
 					{
 						boolean move_made = false;
-						if(piece_clicked!= null && getPieceColorFromJLabel(piece_clicked).equals("white"))
+						if(piece_clicked!= null && getPieceColorFromJLabel(piece_clicked).equals("black"))
 						{
 							piece_clicked.setLocation(e.getX(),e.getY());
 							
@@ -641,48 +650,54 @@ public class AIBoard extends JFrame
 							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Stalemate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 							System.exit(0);
 						}
-						
-						if (move_made) {
-						ArrayList<String> black_moves = generateMoves("black",visual_board);
-						int index = (int) (Math.random()*black_moves.size());
-						String move = black_moves.get(index);
-						try {
-							int[] coords = MoveLegality.getCoordsFromSquare(move.substring(move.length()-2));
-							if (findPieceAtCoords(coords[0],coords[1],visual_board)!=null)
+						if (move_made && turn.equals("white")) {
+						System.out.println(generateFEN(visual_board, moves));
+						StockfishJava thing = new StockfishJava();		
+						thing.startEngine();
+						thing.drawBoard(generateFEN(visual_board, moves));
+						String move = thing.getBestMove(generateFEN(visual_board, moves), 100);
+						int[] coords = MoveLegality.getCoordsFromSquare(move.substring(move.length()-2));
+						if (findPieceAtCoords(coords[0],coords[1],visual_board)!=null)
+						{
+							for (JLabel[] arr:visual_board)
 							{
-								for (JLabel[] arr:visual_board)
+								for (JLabel piece:arr)
 								{
-									for (JLabel piece:arr)
-									{
-										if (piece.getX() == coords[0] && piece.getY() == coords[1])
-											piece = null;
+									if (piece!=null) {
+										if (piece.getX() == coords[0] && piece.getY() == coords[1]) {
 											piece.setVisible(false);
+											piece = null;
+										}
 									}
 								}
-								
 							}
-							makeMove(move.substring(move.length()-4,move.length()-2),move.substring(move.length()-2), visual_board,"black");
 							
-							moves.add(move);
-							try
-							{
-								moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 1);
-							}
-								
-							catch(Exception excep) {
-							}
-							turn = "white";
-						
 						}
-						catch(Exception exception)
+						makeMove(move.substring(move.length()-4,move.length()-2),move.substring(move.length()-2), visual_board,"white");
+						if (move.equals("e1g1"))
 						{
-							System.out.println("Problems arose");
-							System.exit(0);
+							JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
+							white_castling_rook.setLocation(250, 350);
+							moves.add("O-O");
 						}
+						else if (move.equals("e1c1"))
+						{
+							moves.add("white 0-0-0");
+							JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
+							white_qs_castling_rook.setLocation(150,350);
 						}
+						else
+							moves.add(move);
+						try
+						{
+							moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
+						}								
+						catch(Exception excep) {
+						}
+						turn = "black";
 						
 						
-							
+						}
 					}
 
 					@Override
@@ -1382,7 +1397,119 @@ public class AIBoard extends JFrame
 		String[] parts = move.split(" ");
 		return parts[parts.length-1];
 	}
+	public String generateFEN(JLabel[][] visual_board, ArrayList<String> move_list)
+	{
+		String final_fen = "";
+		String[][] board_squares = {{"a8","b8","c8","d8","e8","f8","g8","h8"},{"a7","b7","c7","d7","e7","f7","g7","h7"},{"a6","b6","c6","d6","e6","f6","g6","h6"},{"a5","b5","c5","d5","e5","f5","g5","h5"},{"a4","b4","c4","d4","e4","f4","g4","h4"},{"a3","b3","c3","d3","e3","f3","g3","h3"},{"a2","b2","c2","d2","e2","f2","g2","h2"},{"a1","b1","c1","d1","e1","f1","g1","h1"}};
+		for (String [] row: board_squares)
+		{
+			int counter = 0;
+			for (String square:row)
+			{
+				JLabel piece_on_square = findPieceAtCoords(MoveLegality.getCoordsFromSquare(square)[0],MoveLegality.getCoordsFromSquare(square)[1], visual_board);
+				if (piece_on_square!=null)
+				{
+					if (getPieceColorFromJLabel(piece_on_square).equals("white")) {
+						if (getPieceTypeFromJLabel(piece_on_square).equals("pawn"))
+						{
+							final_fen+="P";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("rook"))
+						{
+							final_fen+="R";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("knight"))
+						{
+							final_fen+="N";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("bishop"))
+						{
+							final_fen+="B";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("queen"))
+						{
+							final_fen+="Q";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("king"))
+						{
+							final_fen+="K";
+						}
+						
+					}
+					if (getPieceColorFromJLabel(piece_on_square).equals("black")) {
+						if (getPieceTypeFromJLabel(piece_on_square).equals("pawn"))
+						{
+							final_fen+="p";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("rook"))
+						{
+							final_fen+="r";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("knight"))
+						{
+							final_fen+="n";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("bishop"))
+						{
+							final_fen+="b";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("queen"))
+						{
+							final_fen+="q";
+						}
+						if (getPieceTypeFromJLabel(piece_on_square).equals("king"))
+						{
+							final_fen+="k";
+						}
+						
+					}
+				}
+				else
+				{
+					final_fen+="1";
+				}
+				
+			}
+			
+			counter+=1;
+			if (counter<7)
+				final_fen+="/";
+		}
+		final_fen = final_fen.substring(0,final_fen.length()-1);
+		final_fen+=" w ";
+		
+		
+		//adding the castling stuff to the FEN
+		if (!hasKingMoved("white", move_list) && !hasKingRookMoved("white", move_list) && !isAnythingObstructing("e1","g1",visual_board))
+		{
+			final_fen+= "K";
+		}
+		if (!hasKingMoved("white", move_list) && !hasQueenRookMoved("white", move_list)&& !isAnythingObstructing("e1","c1",visual_board))
+		{
+			final_fen+= "Q";
+		}
+		if (!hasKingMoved("black", move_list) && !hasKingRookMoved("black", move_list)&& !isAnythingObstructing("e8","g8",visual_board))
+		{
+			final_fen+= "k";
+		}
+		if (!hasKingMoved("black", move_list) && !hasQueenRookMoved("black", move_list)&& !isAnythingObstructing("e8","c8",visual_board))
+		{
+			final_fen+= "q ";
+		}
+		final_fen += "- 2 2";
+		
+		final_fen = final_fen.replaceAll("11111111", "8");
+		final_fen = final_fen.replaceAll("1111111", "7");
+		final_fen = final_fen.replaceAll("111111", "6");
+		final_fen = final_fen.replaceAll("11111", "5");
+		final_fen = final_fen.replaceAll("1111", "4");
+		final_fen = final_fen.replaceAll("111", "3");
+		final_fen = final_fen.replaceAll("11", "2");
+		final_fen = final_fen.replaceAll("1", "1");
+		return final_fen;
+	}
 	public static void main(String[] args)
 	{
 		new AIBoard();
 	}
+}
