@@ -27,6 +27,7 @@ public class AIBoard extends JFrame
 	{
 		setBounds(100,100,600,600);
 		setLayout(null);
+		this.setResizable(false);
 		//Adding in all the pieces in their appropriate starting squares
 		//Use the appropriate file path given where you saved the Chess_Piece_images folder
 		Piece[][] board = new Piece[8][8];
@@ -151,7 +152,7 @@ public class AIBoard extends JFrame
 		moveTable.setBounds(400, 0, 200, 500);
 		this.add(moveTable);
 				
-		
+		//starting move from the engine
 		makeMove("e2","e4", visual_board,"white");
 		turn = "black";
 		moves.add("white pawn e2e4");
@@ -162,7 +163,6 @@ public class AIBoard extends JFrame
 		//Additionally, if an illegal move is dragged and dropped, the mouseListener will reset the piece to its original square
 		this.addMouseListener(new MouseListener()
 				{
-			
 					String piece_type;
 					String piece_color;
 					String piece_icon_str;
@@ -172,13 +172,11 @@ public class AIBoard extends JFrame
 					String second_square;
 					boolean piece_captured = false;
 					JLabel temp = null;
-
 					@Override
 					public void mouseClicked(MouseEvent e) {
 						// TODO Auto-generated method stub
 						
 					}
-
 					@Override
 					public void mousePressed(MouseEvent e) 
 					{
@@ -198,8 +196,6 @@ public class AIBoard extends JFrame
 							}
 						}
 					}
-					
-
 					@Override
 					public void mouseReleased(MouseEvent e) 
 					{
@@ -651,7 +647,6 @@ public class AIBoard extends JFrame
 						thing.startEngine();
 						thing.drawBoard(fen_currently);
 						String move = thing.getBestMove(fen_currently, 1000);
-						System.out.println(move);
 						int[] coords = MoveLegality.getCoordsFromSquare(move.substring(move.length()-2));
 						if (findPieceAtCoords(coords[0],coords[1],visual_board)!=null)
 						{
@@ -689,10 +684,6 @@ public class AIBoard extends JFrame
 							moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
 						}								
 						catch(Exception excep) {
-						}
-						if (isnotPawnCheck("black", visual_board))
-						{
-							System.out.println("here");
 						}
 						if(isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
 						{
