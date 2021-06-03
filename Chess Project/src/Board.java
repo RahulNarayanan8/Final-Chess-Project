@@ -9,6 +9,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,7 +25,8 @@ public class Board extends JFrame
 	{
 		setBounds(100,100,600,600);
 		setLayout(null);
-				
+		this.setResizable(false);
+
 		//Adding in all the pieces in their appropriate starting squares
 		//Use the appropriate file path given where you saved the Chess_Piece_images folder
 		Piece[][] board = new Piece[8][8];
@@ -227,7 +229,7 @@ public class Board extends JFrame
 							
 							if (piece_type.equals("pawn"))
 							{
-								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
+								if ((!(MoveLegality.pawnLegalBehavior(first_square, second_square, piece_captured, piece_color)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -279,7 +281,7 @@ public class Board extends JFrame
 							}
 							else if (piece_type.equals("knight"))
 							{
-								if ((!(MoveLegality.knightLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isnotPawnCheck(turn,visual_board))
+								if ((!(MoveLegality.knightLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -314,7 +316,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("bishop"))
 							{
-								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board) || isnotPawnCheck(turn,visual_board))
+								if ((!(MoveLegality.bishopLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board) || isCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -349,7 +351,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("rook"))
 							{
-								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
+								if ((!(MoveLegality.rookLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -384,7 +386,7 @@ public class Board extends JFrame
 							
 							else if (piece_type.equals("queen"))
 							{
-								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board))
+								if ((!(MoveLegality.queenLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isCheck(turn,visual_board))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -418,7 +420,7 @@ public class Board extends JFrame
 							}
 							else 
 							{
-								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isnotPawnCheck(turn,visual_board) || (first_square.equals("e1") && second_square.equals("e8") || (first_square.equals("e8") && second_square.equals("e1"))))
+								if ((!(MoveLegality.kingLegalBehavior(first_square, second_square)))|| (temp!=null && getPieceColorFromJLabel(temp).equals(turn))|| isAnythingObstructing(first_square,second_square, visual_board)|| isCheck(turn,visual_board) || (first_square.equals("e1") && second_square.equals("e8") || (first_square.equals("e8") && second_square.equals("e1"))))
 								{
 									piece_clicked.setLocation(MoveLegality.getCoordsFromSquare(first_square)[0],MoveLegality.getCoordsFromSquare(first_square)[1]);
 									if (temp!=null && piece_captured) {
@@ -508,8 +510,7 @@ public class Board extends JFrame
 													turn = "white";
 												moves.remove(moves.size()-1);
 												moves.add("white O-O");
-												JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
-												white_castling_rook.setLocation(250, 350);
+												makeMove("h1","f1",visual_board,"white");
 											}
 											if (first_square.equals("e1") && second_square.equals("c1"))
 											{
@@ -524,8 +525,7 @@ public class Board extends JFrame
 													turn = "white";
 												moves.remove(moves.size()-1);
 												moves.add("white 0-0-0");
-												JLabel white_qs_castling_rook = findPieceAtCoords(25,375,visual_board);
-												white_qs_castling_rook.setLocation(150,350);
+												makeMove("a1","d1",visual_board,"white");
 											}
 											if (first_square.equals("e8") && second_square.equals("g8"))
 											{
@@ -540,8 +540,7 @@ public class Board extends JFrame
 													turn = "white";
 												moves.remove(moves.size()-1);
 												moves.add("black O-O");
-												JLabel black_castling_rook = findPieceAtCoords(375,25,visual_board);
-												black_castling_rook.setLocation(250, 0);
+												makeMove("h8","f8",visual_board,"black");
 											}
 											if (first_square.equals("e8") && second_square.equals("c8"))
 											{
@@ -556,8 +555,7 @@ public class Board extends JFrame
 													turn = "white";
 												moves.remove(moves.size()-1);
 												moves.add("black 0-0-0");
-												JLabel white_qs_castling_rook = findPieceAtCoords(25,25,visual_board);
-												white_qs_castling_rook.setLocation(150,0);
+												makeMove("a8","d8",visual_board,"black");
 											}
 											try
 											{
@@ -599,13 +597,13 @@ public class Board extends JFrame
 					}	
 						
 						
-						if(isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
+						if(isCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
 						{
 							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      White Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 							System.exit(0);
 						}
-						if(isnotPawnCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
+						if(isCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
 						{
 							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      Black Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -616,13 +614,13 @@ public class Board extends JFrame
 							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Insufficient Material                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 						}
-						if(!isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
+						if(!isCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
 						{
 							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Stalemate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
 							System.exit(0);
 						}
-						if(!isnotPawnCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
+						if(!isCheck("white", visual_board) && generateMoves("white",visual_board).size() == 0)
 						{
 							game_over = true;
 							JOptionPane.showMessageDialog(null, "                                      Game is drawn by Stalemate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -667,7 +665,7 @@ public class Board extends JFrame
 		setVisible(true);
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
-	
+	//Finding a piece at a given absolute coordinate
 	public JLabel findPieceAtCoords(int x_value, int y_value, JLabel[][] visual_board)
 	{
 		int[] corrected_coords = correctCoords(x_value,y_value);
@@ -689,6 +687,7 @@ public class Board extends JFrame
 		}
 		return returned_piece;
 	}
+	//Method to find a piece of a specific color at a given absolute coordinate
 	public JLabel findSpecificPieceAtCoords(int x_value, int y_value, JLabel[][] visual_board, String piece_color)
 	{
 		int[] corrected_coords = correctCoords(x_value,y_value);
@@ -769,6 +768,7 @@ public class Board extends JFrame
 		return false;
 			
 	}
+	//Finds the square on which the king of a given color is
 	public String findKing(String color, JLabel[][] visual_board)
 	{
 		for (JLabel[] arr:visual_board)
@@ -789,7 +789,8 @@ public class Board extends JFrame
 		
 		return null;
 	}
-	public boolean isnotPawnCheck(String color, JLabel[][] visual_board)
+	//detects whether the given color is being checked in the current position
+	public boolean isCheck(String color, JLabel[][] visual_board)
 	{
 		String king_square = findKing(color,visual_board);
 		for (JLabel[] arr:visual_board)
@@ -840,6 +841,7 @@ public class Board extends JFrame
 		}
 		return false;
 	}
+	//moves the piece at start to stop
 	public void makeMove(String start, String stop, JLabel[][] visual_board, String color)
 	{
 		JLabel piece_moved = findSpecificPieceAtCoords(MoveLegality.getCoordsFromSquare(start)[0],MoveLegality.getCoordsFromSquare(start)[1], visual_board, color);
@@ -849,6 +851,7 @@ public class Board extends JFrame
 			}
 			
 	}
+	//Generates the legal moves in a given position for a certain color (used to detect checkmate and stalemate)
 	public ArrayList<String> generateMoves(String color, JLabel[][] visual_board)
 	{
 		ArrayList<String> moveList = new ArrayList<String>();
@@ -888,7 +891,7 @@ public class Board extends JFrame
 										if (!isSquareOccupied(s,visual_board))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -904,7 +907,7 @@ public class Board extends JFrame
 										if (!isAnythingObstructing(piece_square,s,visual_board))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -922,7 +925,7 @@ public class Board extends JFrame
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -943,7 +946,7 @@ public class Board extends JFrame
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -964,7 +967,7 @@ public class Board extends JFrame
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -984,7 +987,7 @@ public class Board extends JFrame
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -1005,7 +1008,7 @@ public class Board extends JFrame
 										if (!isSquareOccupied(s,visual_board) || (isSquareOccupied(s,visual_board) &&!isOwnPiece(color,s,visual_board)))
 										{
 											makeMove(piece_square,s,visual_board, color);
-											if (!isnotPawnCheck(color,visual_board))
+											if (!isCheck(color,visual_board))
 											{
 												makeMove(s,piece_square,visual_board, color);
 												moveList.add(getPieceTypeFromJLabel(piece)+piece_square+s);
@@ -1033,6 +1036,7 @@ public class Board extends JFrame
 		
 		return moveList;
 	}
+	//Checks whether a square has a piece on it
 	public boolean isSquareOccupied(String square, JLabel[][] visual_board)
 	{
 		int[] coords = MoveLegality.getCoordsFromSquare(square);
@@ -1042,6 +1046,7 @@ public class Board extends JFrame
 		}
 		return true;
 	}
+	//Checks whether a piece at a given square matches a given color
 	public boolean isOwnPiece(String color, String square, JLabel[][] visual_board)
 	{
 		int[] coords = MoveLegality.getCoordsFromSquare(square);
@@ -1051,6 +1056,7 @@ public class Board extends JFrame
 		}
 		return false;
 	}
+	//Checks whether one color is attacking a given square
 	public boolean isSideAttackingSquare(String square, String color, JLabel[][] visual_board)
 	{
 		for (JLabel[] arr:visual_board)
@@ -1111,19 +1117,20 @@ public class Board extends JFrame
 		
 		return false;
 	}
+	//returns an array of the squares in which pieces delivering check reside
 	public ArrayList<String> findCheckingPiecesSquares(String color, JLabel[][] visual_board)
 	{
 		String side_checked = "";
 		if (color.equals("white"))
 		{
 			side_checked = "black";
-			if (!isnotPawnCheck("black",visual_board))
+			if (!isCheck("black",visual_board))
 				return null;
 		}
 		if (color.equals("black"))
 		{
 			side_checked = "white";
-			if (!isnotPawnCheck("white",visual_board))
+			if (!isCheck("white",visual_board))
 				return null;
 		}
 		ArrayList<String> checking_pieces = new ArrayList<String>();
@@ -1187,6 +1194,7 @@ public class Board extends JFrame
 		}
 		return checking_pieces;
 	}
+	//Used for castling to check whether the king has moved at some point
 	public boolean hasKingMoved(String color, ArrayList<String> moves)
 	{
 		for (String s:moves)
@@ -1196,6 +1204,7 @@ public class Board extends JFrame
 		}
 		return false;
 	}
+	//Same as previous method but for a rook
 	public boolean hasKingRookMoved(String color, ArrayList<String> moves)
 	{
 		if (color.equals("white"))
@@ -1236,6 +1245,7 @@ public class Board extends JFrame
 		}
 		return false;
 	}
+	//Used for checking if a position is a draw
 	public ArrayList<String> getAllPiecesBySide(String color,JLabel[][] visual_board)
 	{
 		ArrayList<String> list_of_pieces = new ArrayList<String>();
@@ -1252,6 +1262,7 @@ public class Board extends JFrame
 		}
 		return list_of_pieces;
 	}
+	//Drawing by insufficient material
 	public boolean isDrawByInsufficientMaterial(JLabel[][] visual_board)
 	{
 		ArrayList<String> white_pieces = getAllPiecesBySide("white",visual_board);
