@@ -11,15 +11,10 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-
 
 public class AIBoard extends JFrame
 {
-	// One player chess (against computer) (extremely skilled computer) (ELO ≈ 3607)
+	// One player chess (against computer) (extremely skilled computer) (ELO ≈ 3600)
 	
 	private JLabel piece_clicked = null;
 	private JLabel[][] visual_board = new JLabel[8][8];
@@ -651,11 +646,12 @@ public class AIBoard extends JFrame
 							System.exit(0);
 						}
 						if (move_made && turn.equals("white")) {
-						System.out.println(generateFEN(visual_board, moves));
+						String fen_currently = (generateFEN(visual_board, moves));
 						StockfishJava thing = new StockfishJava();		
 						thing.startEngine();
-						thing.drawBoard(generateFEN(visual_board, moves));
-						String move = thing.getBestMove(generateFEN(visual_board, moves), 100);
+						thing.drawBoard(fen_currently);
+						String move = thing.getBestMove(fen_currently, 1000);
+						System.out.println(move);
 						int[] coords = MoveLegality.getCoordsFromSquare(move.substring(move.length()-2));
 						if (findPieceAtCoords(coords[0],coords[1],visual_board)!=null)
 						{
@@ -673,7 +669,7 @@ public class AIBoard extends JFrame
 							}
 							
 						}
-						makeMove(move.substring(move.length()-4,move.length()-2),move.substring(move.length()-2), visual_board,"white");
+						makeMove(move.substring(0,2),move.substring(2), visual_board,"white");
 						if (move.equals("e1g1"))
 						{
 							JLabel white_castling_rook = findPieceAtCoords(375,375,visual_board);
@@ -693,6 +689,16 @@ public class AIBoard extends JFrame
 							moveTable.setValueAt(moves.get(moves.size()-1).substring(moves.get(moves.size()-1).length()-4), (moves.size()-1)/2, 0);
 						}								
 						catch(Exception excep) {
+						}
+						if (isnotPawnCheck("black", visual_board))
+						{
+							System.out.println("here");
+						}
+						if(isnotPawnCheck("black", visual_board) && generateMoves("black",visual_board).size() == 0)
+						{
+							game_over = true;
+							JOptionPane.showMessageDialog(null, "                                      White Wins By Checkmate                                      \n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+							System.exit(0);
 						}
 						turn = "black";
 						
