@@ -132,12 +132,7 @@ public class StockfishJava {
 	public void drawBoard(String fen) {
 		sendCommand("position fen " + fen);
 		sendCommand("d");
-
 		String[] rows = getOutput(0).split("\n");
-
-		for (int i = 1; i < 18; i++) {
-			System.out.println(rows[i]);
-		}
 	}
 
 	/**
