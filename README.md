@@ -2,4 +2,4 @@
 Final AP CS A project
 Java swing
 
-Because I am a bit of an idiot, my program is set up such that it creates the piece components based on images stored locally on me device. In order for others to run it you will need to save the pictures on your device and change the file paths used to access these images. Also, the stockfish executable is Mac specific so I would recommend getting the one specific to your operating system.
+Because I am a bit of an idiot, my program is set up such that it creates the piece components based on images stored locally on me device. In order for others to run it you will need to save the pictures on your device and change the file paths used to access these images. Also, the stockfish executable is Mac specific so I would recommend getting the one specific to your operating system (https://stockfishchess.org/download/).
